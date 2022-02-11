@@ -32,7 +32,7 @@ def generate_password():
 
 
 def save_data():
-    website = web_addr_entry.get()
+    website = web_addr_entry.get().lower()
     email = mail_entry.get()
     password = pass_entry.get()
 
@@ -59,6 +59,27 @@ def save_data():
         finally:
             web_addr_entry.delete(0, END)
             pass_entry.delete(0, END)
+
+#--------------------------save_data------------------------------#
+
+
+def search_data():
+    website = web_addr_entry.get().lower()
+
+    try:
+        with open('data.json', 'r') as data_file:
+            data = json.load(data_file)
+    except FileNotFoundError:
+        messagebox.showinfo(title="your info", message="you have no data.")
+    else:
+        if website in data:
+            email = data[website]["email"]
+            password = data[website]["password"]
+            messagebox.showinfo(title="your info", message=f"{email}\n{password}")
+        else:
+            messagebox.showinfo(title="your info", message=f"you have no data for {website}.")
+
+
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -88,8 +109,12 @@ add_button = Button(text="Add", width=35, bg="white",
                          fg="black", command=save_data)
 add_button.grid(row=4, column=1, columnspan=2)
 
-web_addr_entry = Entry(width=35)
-web_addr_entry.grid(row=1, column=1, columnspan=2)
+search_button = Button(text="Search", width=15, bg="white",
+                         fg="black", command=search_data)
+search_button.grid(row=1, column=2)
+
+web_addr_entry = Entry(width=20)
+web_addr_entry.grid(row=1, column=1)
 web_addr_entry.focus()
 
 mail_entry = Entry(width=35)
