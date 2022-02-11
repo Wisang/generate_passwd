@@ -1,3 +1,4 @@
+import json
 from tkinter import *
 from tkinter import messagebox
 import random
@@ -35,16 +36,29 @@ def save_data():
     email = mail_entry.get()
     password = pass_entry.get()
 
+    new_data = {
+        website: {
+            "email": email,
+            "password": password
+        }
+    }
+
     if len(website) == 0 or len(password) == 0:
         messagebox.showinfo(title="Oops", message="empty")
     else:
-        is_ok = messagebox.askokcancel(title="website", message='ok to save?')
-
-        if is_ok:
-            with open('data.txt', "a") as data_file:
-                data_file.write(f"{website} | {email} | {password}\n")
-                web_addr_entry.delete(0, END)
-                pass_entry.delete(0, END)
+        try:
+            with open('data.json', 'r') as data_file:
+                data = json.load(data_file)
+        except FileNotFoundError:
+            with open('data.json', 'w') as data_file:
+                json.dump(new_data, data_file, indent=4)
+        else:
+            data.update(new_data)
+            with open('data.json', "w") as data_file:
+                json.dump(data, data_file, indent=4)
+        finally:
+            web_addr_entry.delete(0, END)
+            pass_entry.delete(0, END)
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -70,19 +84,19 @@ generate_button = Button(text="Generate Password", bg="white",
                          fg="black", command=generate_password)
 generate_button.grid(column=2, row=3)
 
-add_button = Button(text="Add", width=36, bg="white",
+add_button = Button(text="Add", width=35, bg="white",
                          fg="black", command=save_data)
 add_button.grid(row=4, column=1, columnspan=2)
 
-web_addr_entry = Entry(width=39)
+web_addr_entry = Entry(width=35)
 web_addr_entry.grid(row=1, column=1, columnspan=2)
 web_addr_entry.focus()
 
-mail_entry = Entry(width=39)
+mail_entry = Entry(width=35)
 mail_entry.grid(row=2, column=1, columnspan=2)
 mail_entry.insert(0, "wseom7@gmail.com")
 
-pass_entry = Entry(width=22)
+pass_entry = Entry(width=20)
 pass_entry.grid(row=3, column=1)
 
 
